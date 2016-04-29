@@ -2,32 +2,32 @@ import java.awt.event.MouseEvent;
 
 import acm.graphics.GObject;
 import acm.graphics.GOval;
-import acm.graphics.GRect;
 
-public class MenuPane extends GraphicsPane {
+public class MainMenu extends GraphicsPane {
 	private MainApplication program; //you will use program to get access to all of the GraphicsProgram calls
-	private GRect rect;
+	private GOval oval;
 	
-	public MenuPane(MainApplication app) {
-		program = app;
-		rect = new GRect(200, 200, 200, 200);
-		rect.setFilled(true);
+	public MainMenu(MainApplication app) {
+		this.program = app;
+		oval = new GOval(100, 100, 100, 100);
 	}
+	
 	@Override
 	public void showContents() {
-		program.add(rect);
+		program.add(oval);
 	}
 
 	@Override
 	public void hideContents() {
-		program.remove(rect);
+		program.remove(oval);
 	}
-
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
 		GObject obj = program.getElementAt(e.getX(), e.getY());
-		if(obj == rect) {
-			program.switchToSome();
+		if(obj == oval) {
+			program.switchBack();
 		}
 	}
+
 }

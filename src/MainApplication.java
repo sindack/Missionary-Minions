@@ -7,16 +7,16 @@ public class MainApplication extends GraphicsApplication {
 	public static final int WINDOW_WIDTH = 800;
 	public static final int WINDOW_HEIGHT = 600;
 	
-	private SomePane somePane;
-	private MenuPane menu;
+	private MainMenu somePane;
+	private SubMenu menu;
 	
 	public void init() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	}
 	
 	public void run() {
-		somePane = new SomePane(this);
-		menu = new MenuPane(this);
+		somePane = new MainMenu(this);
+		menu = new SubMenu(this);
 		setupInteractions();
 		switchToSome();
 	}
