@@ -1,5 +1,6 @@
+package menuClasses;
 import java.awt.*;
-
+import gameClasses.*;
 import acm.graphics.*;
 import acm.program.*;
 
@@ -9,6 +10,7 @@ public class MainApplication extends GraphicsApplication {
 	
 	private MainMenu somePane;
 	private SubMenu menu;
+	private GraphicsGame game;
 	
 	public void init() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -17,6 +19,7 @@ public class MainApplication extends GraphicsApplication {
 	public void run() {
 		somePane = new MainMenu(this);
 		menu = new SubMenu(this);
+		game = new GraphicsGame(this);
 		setupInteractions();
 		switchToSome();
 	}
@@ -40,5 +43,9 @@ public class MainApplication extends GraphicsApplication {
 	
 	public void switchToSome() {
 		switchToScreen(somePane);
+	}
+	
+	public void switchToGame(){
+		switchToScreen(game);
 	}
 }
