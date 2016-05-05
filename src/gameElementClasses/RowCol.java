@@ -1,4 +1,4 @@
-package gameClasses;
+package gameElementClasses;
 /**
  * Simple class that represents a row and a column, with simple getters and setters for both
  * @author Osvaldo
