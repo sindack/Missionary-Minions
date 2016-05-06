@@ -18,6 +18,7 @@ public class GridData {
 	
 	public GridData(RowCol worldGrid, RowCol gridSize){ // worldGrid, gridSize
 		worldLocation = worldGrid;
+		movementQueue = new ArrayList<RowCol>();
 		
 		NUM_ROWS = gridSize.getRow();
 		NUM_COLS = gridSize.getCol();
@@ -38,12 +39,39 @@ public class GridData {
 		}
 	}
 	
+	
 	public String getSpaceData(RowCol space){
 		return grid[space.getRow()][space.getCol()];
 	}
 	
 	public void appendMovementQueue(RowCol location){
 		movementQueue.add(location);
+	}
+	
+	public void clearMovementQueue(){
+		movementQueue.clear();
+	}
+	
+	public int getMovementQueueSize(){
+		return movementQueue.size();
+	}
+	
+	public int movementQueueContains(RowCol location){
+		for (int i = 0; i < movementQueue.size(); i++){
+			RowCol l = movementQueue.get(i);
+			if (location.getRow() == l.getRow() && location.getCol() == l.getCol()){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public ArrayList<RowCol> copyMovementQueue(){
+		return movementQueue;
+	}
+	
+	public RowCol getMostRecentInMovementQueue(){
+		return movementQueue.get(movementQueue.size() - 1);
 	}
 	
 	public void updateObjectMovement(RowCol lastLocation, RowCol newLocation, String entity){
@@ -65,5 +93,9 @@ public class GridData {
 	
 	public int getNUM_COLS() {
 		return NUM_COLS;
+	}
+
+	public void removeFromMovementQueue(int i) {
+		movementQueue.remove(i);
 	}
 }

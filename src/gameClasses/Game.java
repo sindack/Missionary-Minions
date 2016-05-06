@@ -2,8 +2,9 @@ package gameClasses;
 import gameElementClasses.*;
 
 public class Game {
-	private final RowCol OVERWORLD_SIZE = new RowCol(15, 15);
-	private final RowCol PLAYER_INIT_STARTING_LOCATION = new RowCol(14, 7);
+	private final static RowCol OVERWORLD_SIZE = new RowCol(15, 15);
+
+	private final static RowCol PLAYER_INIT_STARTING_LOCATION = new RowCol(13, 7);
 		
 	private GridData data;
 	
@@ -56,4 +57,7 @@ public class Game {
 		this.worldLocation = worldLocation;
 	}
 	
+	public static RowCol getOverworldSize() {
+		return OVERWORLD_SIZE;
+	}
 }

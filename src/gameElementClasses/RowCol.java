@@ -31,7 +31,11 @@ public class RowCol {
 	public void setCol(int col) {
 		this.col = col;
 	}
-
+	
+	@Override
+	public String toString(){
+		return "(" + Integer.toString(row) + ", " + Integer.toString(col) + ")";
+	}
 	
 	//TODO put any additional methods here
 }
