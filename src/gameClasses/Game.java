@@ -57,6 +57,15 @@ public class Game {
 		this.worldLocation = worldLocation;
 	}
 	
+	public Player getPlayer(){
+		return player;
+	}
+	
+	public void setPlayerLocation(RowCol location){
+		player.setLocation(location);
+		System.out.println(location.toString());
+	}
+	
 	public static RowCol getOverworldSize() {
 		return OVERWORLD_SIZE;
 	}
