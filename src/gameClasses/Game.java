@@ -53,8 +53,10 @@ public class Game {
 		return worldLocation;
 	}
 
-	public void setWorldLocation(RowCol worldLocation) {
-		this.worldLocation = worldLocation;
+	public void setWorldLocation(int deltaX, int deltaY) {
+		worldLocation.setRow(worldLocation.getRow() + deltaX);
+		worldLocation.setCol(worldLocation.getCol() + deltaY);
+		System.out.println("World Location: " + worldLocation);
 	}
 	
 	public Player getPlayer(){
@@ -63,7 +65,7 @@ public class Game {
 	
 	public void setPlayerLocation(RowCol location){
 		player.setLocation(location);
-		System.out.println(location.toString());
+		System.out.println("Player Location: " + player.getLocation());
 	}
 	
 	public static RowCol getOverworldSize() {

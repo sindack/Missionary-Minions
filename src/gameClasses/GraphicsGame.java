@@ -11,7 +11,7 @@ import menuClasses.*;
 
 public class GraphicsGame extends GraphicsPane{
 
-	private final RowCol STARTING_WORLD_POSITION = new RowCol(5, 0);
+	private final RowCol STARTING_WORLD_POSITION = new RowCol(0, 0);
 	private final int NUMBER_OF_SQUARES = 15;
 	
 	private ArrayList<GLine> horizontalGridLines;
@@ -83,7 +83,6 @@ public class GraphicsGame extends GraphicsPane{
 			isPlayerSelected = false;
 			if (obj == player){
 				isPlayerSelected = true;
-				System.out.println("True");
 			}
 		}
 	}
@@ -232,20 +231,23 @@ public class GraphicsGame extends GraphicsPane{
 				RowCol p = game.getPlayer().getLocation();
 				if (p.getRow() >= Game.getOverworldSize().getRow() - 1){
 					System.out.println("Moving world right...");
-					
 					moveWorld(false, 1);
+					game.setWorldLocation(1, 0);
 				}
 				else if (p.getRow() <= 0){
 					System.out.println("Moving world left...");
 					moveWorld(false, -1);
+					game.setWorldLocation(-1, 0);
 				}
 				else if (p.getCol() >= Game.getOverworldSize().getCol() - 1){
 					System.out.println("Moving world down...");
 					moveWorld(true, 1);
+					game.setWorldLocation(0, -1);
 				}
 				else if (p.getCol() <= 0){
 					System.out.println("Moving world up...");
 					moveWorld(true, -1);
+					game.setWorldLocation(0, 1);
 				}
 				game.setPlayerLocation(new RowCol((int)(player.getLocation().getX() / getGridWidth()), (int)(player.getLocation().getY() / getGridHeight())));
 				canPathBeDrawn = true;
