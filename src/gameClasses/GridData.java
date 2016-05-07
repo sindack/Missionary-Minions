@@ -8,11 +8,13 @@ import gameElementClasses.*;
 public class GridData {
 	private final int NUM_ROWS;
 	private final int NUM_COLS;
+	private final static int ROCK_SPAWN_CHANCE = 3;
 	
 	private String[][] grid;
 	private RowCol worldLocation;
 	private int cameFromX;
 	private int cameFromY;
+	private RowCol playerStartLocation;
 	
 	private ArrayList<RowCol> movementQueue;
 	private ArrayList<Rock> rocks;
@@ -21,14 +23,16 @@ public class GridData {
 	
 	
 	
-	public GridData(RowCol worldGrid, RowCol gridSize, int cameFromX, int cameFromY, String[][] oldGrid){ // worldGrid, gridSize
+	public GridData(RowCol worldGrid, RowCol gridSize, int cameFromX, int cameFromY, String[][] oldGrid, RowCol playerStartLocation){ // worldGrid, gridSize
 		worldLocation = worldGrid;
 		movementQueue = new ArrayList<RowCol>();
 		this.cameFromX = cameFromX;
 		this.cameFromY = cameFromY;
 		rocks = new ArrayList<Rock>();
+		
 		rand = new Random();
 		grid = oldGrid;
+		this.playerStartLocation = playerStartLocation;
 		
 		NUM_ROWS = gridSize.getRow();
 		NUM_COLS = gridSize.getCol();
@@ -70,7 +74,7 @@ public class GridData {
 		for (int i = y; i < NUM_ROWS - iSizeFactor; i++){
 			for (int j = x; j < NUM_COLS - jSizeFactor; j++){
 				grid[i][j] = "Empty";
-				if (rand.nextInt(7) == 0){
+				if (rand.nextInt(ROCK_SPAWN_CHANCE) == 0 && i != playerStartLocation.getRow() && j != playerStartLocation.getCol()){
 					grid[i][j] = "Rock";
 					rocks.add(new Rock(new RowCol(i, j)));
 				}

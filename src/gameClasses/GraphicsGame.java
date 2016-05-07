@@ -1,4 +1,5 @@
 package gameClasses;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
@@ -186,9 +187,11 @@ public class GraphicsGame extends GraphicsPane{
 
 	private void showRocks(){
 		ArrayList<Rock> r = game.getGridData().getRocks();
+		Font f = new Font("Arial-BoldMT", Font.BOLD, 40);
 		for (int i = 0; i < r.size(); i++){
 			RowCol rockPos = r.get(i).getLocation();
-			rockLocations.add(new GLabel("Rock", getXFromRowCol(rockPos.getCol()) + 4 , getYFromRowCol(rockPos.getRow()) + 13));
+			rockLocations.add(new GLabel("O", getXFromRowCol(rockPos.getCol()) + 8 , getYFromRowCol(rockPos.getRow()) + 38));
+			rockLocations.get(i).setFont(f);
 			program.add(rockLocations.get(i));
 		}
 		
@@ -379,14 +382,16 @@ public class GraphicsGame extends GraphicsPane{
 	
 	public void addRocks(boolean isMovingVertical, int multiplier){
 		ArrayList<Rock> r = game.getGridData().getRocks();
+		Font f = new Font("Arial-BoldMT", Font.BOLD, 40);
 		for (int i = 0; i < r.size(); i++){
-			GLabel newRockLabel = new GLabel("Rock");
+			GLabel newRockLabel = new GLabel("O");
 			RowCol rLoc = r.get(i).getLocation();
 			if (isMovingVertical){
-				newRockLabel.setLocation(getXFromRowCol(rLoc.getCol()) + 4, (rLoc.getRow() - multiplier * 2) * getGridHeight() + 13 + (multiplier * Game.getOverworldSize().getCol()) * getGridHeight());
+				newRockLabel.setLocation(getXFromRowCol(rLoc.getCol()) + 8, (rLoc.getRow() - multiplier * 2) * getGridHeight() + 38 + (multiplier * Game.getOverworldSize().getCol()) * getGridHeight());
 			}else{
-				newRockLabel.setLocation((rLoc.getCol() - multiplier * 2) * getGridWidth() + 4 + (multiplier * Game.getOverworldSize().getRow())*getGridWidth(), getYFromRowCol(rLoc.getRow()) + 13);
+				newRockLabel.setLocation((rLoc.getCol() - multiplier * 2) * getGridWidth() + 8 + (multiplier * Game.getOverworldSize().getRow())*getGridWidth(), getYFromRowCol(rLoc.getRow()) + 38);
 			}
+			newRockLabel.setFont(f);
 			program.add(newRockLabel);
 			newRockLocations.add(newRockLabel);
 		}
@@ -415,7 +420,7 @@ public class GraphicsGame extends GraphicsPane{
 		int j = 0; int size = rockLocations.size();
 		for (int i = 0; i < size && j < rockLocations.size(); i++){
 			if (isMovingVertical){
-				if ((multiplier == 1 && rockLocations.get(j).getLocation().getY() >= player.getLocation().getY() - getGridHeight()) || (multiplier == -1 && rockLocations.get(j).getLocation().getY() <= player.getLocation().getY() + getGridHeight())){
+				if ((multiplier == 1 && rockLocations.get(j).getLocation().getY() >= player.getLocation().getY() - getGridHeight() * 1.5) || (multiplier == -1 && rockLocations.get(j).getLocation().getY() <= player.getLocation().getY() + getGridHeight()*2.1)){
 					j++;
 				}
 				else{
@@ -423,7 +428,7 @@ public class GraphicsGame extends GraphicsPane{
 				}
 			}
 			else{
-				if ((multiplier == 1 && rockLocations.get(j).getLocation().getX() >= player.getLocation().getX() - getGridWidth() - 2) || (multiplier == -1 && rockLocations.get(j).getLocation().getX() <= player.getLocation().getX() + getGridWidth() + 2)){
+				if ((multiplier == 1 && rockLocations.get(j).getLocation().getX() >= player.getLocation().getX() - getGridWidth() * 1.5) || (multiplier == -1 && rockLocations.get(j).getLocation().getX() <= player.getLocation().getX() + getGridWidth() * 1.5)){
 					j++;
 				}
 				else{

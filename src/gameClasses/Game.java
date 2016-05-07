@@ -30,7 +30,7 @@ public class Game {
 	}
 	
 	private void initializeGridData(){
-		data = new GridData(worldLocation, OVERWORLD_SIZE, 0, 0, null);
+		data = new GridData(worldLocation, OVERWORLD_SIZE, 0, 0, null, player.getLocation());
 	}
 	
 	private void addPlayerToGrid(){
@@ -65,7 +65,7 @@ public class Game {
 		String[][] oldGrid = data.getGrid();
 		
 		data = null;
-		data = new GridData(worldLocation, OVERWORLD_SIZE, deltaX, -deltaY, oldGrid);
+		data = new GridData(worldLocation, OVERWORLD_SIZE, deltaX, -deltaY, oldGrid, player.getLocation());
 		System.out.println("World Location: " + worldLocation);
 	}
 	
