@@ -17,9 +17,12 @@ public class GraphicsGame extends GraphicsPane{
 	private ArrayList<GLine> horizontalGridLines;
 	private ArrayList<GLine> verticalGridLines;
 	private ArrayList<GLine> pathLines;
+	private ArrayList<GLabel> rockLocations;
+	private ArrayList<GLabel> newRockLocations;
 	
 	private boolean isPlayerSelected;
 	private boolean canPathBeDrawn;
+	private boolean isCollidingWithRock;
 	
 	private Game game;
 	
@@ -38,6 +41,10 @@ public class GraphicsGame extends GraphicsPane{
 		game = new Game(STARTING_WORLD_POSITION);
 		pathLines = new ArrayList<GLine>();
 		player = new GLabel("Player");
+		rockLocations = new ArrayList<GLabel>();
+		newRockLocations = new ArrayList<GLabel>();
+		isCollidingWithRock = false;
+		
 		rand = new Random();
 		canPathBeDrawn = true;
 		isPlayerSelected = false;
@@ -106,10 +113,20 @@ public class GraphicsGame extends GraphicsPane{
 									- game.getGridData().getMostRecentInMovementQueue().getCol()) >= 2) {
 						attemptToFixPath(consoleLocation);
 					} else {
-						drawPathLines(consoleLocation);
+						if ((x <= Game.getOverworldSize().getRow() - 1 && x >= 0 && y <= Game.getOverworldSize().getCol() - 1
+								&& y >= 0) && game.getEntityAtLocation(consoleLocation) != "Rock"){
+							drawPathLines(consoleLocation);
+						}
 					}
 					addAndDrawPathLines();
-					canPathBeDrawn = false;
+					mouseReleasedContents();
+					return;
+				}
+				if (game.getEntityAtLocation(consoleLocation) == "Rock" || isCollidingWithRock){
+					
+					isCollidingWithRock = true;
+					drawPathLines(consoleLocation);
+					addAndDrawPathLines();
 					return;
 				}
 				if (game.getGridData()
@@ -130,6 +147,9 @@ public class GraphicsGame extends GraphicsPane{
 	}
 
 	private void attemptToFixPath(RowCol dest){
+		if (isCollidingWithRock){
+			return;
+		}
 		int movingX = game.getGridData().getMostRecentInMovementQueue().getRow();
 		int movingY = game.getGridData().getMostRecentInMovementQueue().getCol();
 		while (movingX != dest.getRow() || movingY != dest.getCol()){
@@ -149,14 +169,31 @@ public class GraphicsGame extends GraphicsPane{
 			}
 			movingX += deltaX;
 			movingY += deltaY;
-			game.getGridData().appendMovementQueue(new RowCol(movingX, movingY));
+			RowCol newLocation = new RowCol(movingX, movingY);
 			if (!(movingX < Game.getOverworldSize().getRow() - 1 && movingX > 0 && movingY < Game.getOverworldSize().getCol() - 1 && movingY > 0)){
+				return;
+			}
+			if (game.getEntityAtLocation(newLocation) != "Rock"){
+				game.getGridData().appendMovementQueue(newLocation);
+			}
+			else{
+				System.out.println("ROCK WAS IN THE WAY");
+				isCollidingWithRock = true;
 				return;
 			}
 		}
 	}
 
-
+	private void showRocks(){
+		ArrayList<Rock> r = game.getGridData().getRocks();
+		for (int i = 0; i < r.size(); i++){
+			RowCol rockPos = r.get(i).getLocation();
+			rockLocations.add(new GLabel("Rock", getXFromRowCol(rockPos.getCol()) + 4 , getYFromRowCol(rockPos.getRow()) + 13));
+			program.add(rockLocations.get(i));
+		}
+		
+		
+	}
 
 	private int moveY(RowCol dest, int movingY) {
 		return movingY == dest.getCol() ? 0 : movingY < dest.getCol() ? 1:-1;
@@ -174,12 +211,15 @@ public class GraphicsGame extends GraphicsPane{
 	private void drawPathLines(RowCol consoleLocation) {
 		int indexContains = game.getGridData().movementQueueContains(consoleLocation);
 		if (indexContains == -1){ // Adds a location to the queue if that location isn't already there
-			game.getGridData().appendMovementQueue(consoleLocation);
+			if (!isCollidingWithRock){
+				game.getGridData().appendMovementQueue(consoleLocation);
+			}
 			
 		}
 		else{
 			while (indexContains + 1 < game.getGridData().getMovementQueueSize()){
 				game.getGridData().removeFromMovementQueue(indexContains + 1);
+				isCollidingWithRock = false;
 			}
 		}
 	}
@@ -203,6 +243,11 @@ public class GraphicsGame extends GraphicsPane{
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		mouseReleasedContents();
+		
+	}
+
+	private void mouseReleasedContents(){
 		if (isPlayerSelected){
 			canPathBeDrawn = false;
 			isPlayerSelected = false;
@@ -210,7 +255,6 @@ public class GraphicsGame extends GraphicsPane{
 			game.getGridData().clearMovementQueue();	
 		}
 	}
-
 
 
 	private void removePathLinesAndMovePlayer() {
@@ -230,27 +274,32 @@ public class GraphicsGame extends GraphicsPane{
 				
 				RowCol p = game.getPlayer().getLocation();
 				if (p.getRow() >= Game.getOverworldSize().getRow() - 1){
+					game.setWorldLocation(1, 0);
 					System.out.println("Moving world right...");
 					moveWorld(false, 1);
-					game.setWorldLocation(1, 0);
+					
 				}
 				else if (p.getRow() <= 0){
+					game.setWorldLocation(-1, 0);
 					System.out.println("Moving world left...");
 					moveWorld(false, -1);
-					game.setWorldLocation(-1, 0);
+					
 				}
 				else if (p.getCol() >= Game.getOverworldSize().getCol() - 1){
+					game.setWorldLocation(0, -1);
 					System.out.println("Moving world down...");
 					moveWorld(true, 1);
-					game.setWorldLocation(0, -1);
+					
 				}
 				else if (p.getCol() <= 0){
+					game.setWorldLocation(0, 1);
 					System.out.println("Moving world up...");
 					moveWorld(true, -1);
-					game.setWorldLocation(0, 1);
+					
 				}
 				game.setPlayerLocation(new RowCol((int)(player.getLocation().getX() / getGridWidth()), (int)(player.getLocation().getY() / getGridHeight())));
 				canPathBeDrawn = true;
+				isCollidingWithRock = false;
 			}
 		}, 0);
 	}
@@ -267,6 +316,7 @@ public class GraphicsGame extends GraphicsPane{
 	}
 	
 	private void moveWorld(boolean isMovingVertical, int multiplier){
+		addRocks(isMovingVertical, multiplier);
 		if (isMovingVertical){
 			addHorizontalGridLines(multiplier);
 		}
@@ -276,6 +326,7 @@ public class GraphicsGame extends GraphicsPane{
 		showGridLines();
 		for (int i = 0; i < (isMovingVertical ? (10 * (Game.getOverworldSize().getCol() - 2)) : 10 * (Game.getOverworldSize().getCol() - 2)); i++){
 			player.move(isMovingVertical ? 0 : -multiplier * getGridWidth() / 10, isMovingVertical ? -multiplier * getGridHeight() / 10 : 0);
+			moveRocks(isMovingVertical, -multiplier);
 			if (isMovingVertical){
 				moveHorizontalLines(-multiplier);
 			}
@@ -290,9 +341,11 @@ public class GraphicsGame extends GraphicsPane{
 		else{
 			removeExtraVerticalLines();
 		}
+		removeExtraRocks(isMovingVertical, multiplier);
 		
 	}
 	
+
 	private void removeExtraVerticalLines(){
 		while(verticalGridLines.size() > 0){
 			program.remove(verticalGridLines.get(0));
@@ -324,25 +377,100 @@ public class GraphicsGame extends GraphicsPane{
 		}
 	}
 	
+	public void addRocks(boolean isMovingVertical, int multiplier){
+		ArrayList<Rock> r = game.getGridData().getRocks();
+		for (int i = 0; i < r.size(); i++){
+			GLabel newRockLabel = new GLabel("Rock");
+			RowCol rLoc = r.get(i).getLocation();
+			if (isMovingVertical){
+				newRockLabel.setLocation(getXFromRowCol(rLoc.getCol()) + 4, (rLoc.getRow() - multiplier * 2) * getGridHeight() + 13 + (multiplier * Game.getOverworldSize().getCol()) * getGridHeight());
+			}else{
+				newRockLabel.setLocation((rLoc.getCol() - multiplier * 2) * getGridWidth() + 4 + (multiplier * Game.getOverworldSize().getRow())*getGridWidth(), getYFromRowCol(rLoc.getRow()) + 13);
+			}
+			program.add(newRockLabel);
+			newRockLocations.add(newRockLabel);
+		}
+	}
 	
+	public void moveRocks(boolean isMovingVertical, int multiplier){
+		if (isMovingVertical){
+			for (int i = 0; i < rockLocations.size(); i++){
+				rockLocations.get(i).move(0, multiplier*getGridHeight() / 10);
+			}
+			for (int i = 0; i < newRockLocations.size(); i++){
+				newRockLocations.get(i).move(0, multiplier*getGridHeight() / 10);
+			}
+		}
+		else{
+			for (int i = 0; i < rockLocations.size(); i++){
+				rockLocations.get(i).move(multiplier*getGridWidth() / 10,0);
+			}
+			for (int i = 0; i < newRockLocations.size(); i++){
+				newRockLocations.get(i).move(multiplier * getGridWidth() / 10, 0);
+			}
+		}
+	}
 	
+	public void removeExtraRocks(boolean isMovingVertical, int multiplier){
+		int j = 0; int size = rockLocations.size();
+		for (int i = 0; i < size && j < rockLocations.size(); i++){
+			if (isMovingVertical){
+				if ((multiplier == 1 && rockLocations.get(j).getLocation().getY() >= player.getLocation().getY() - getGridHeight()) || (multiplier == -1 && rockLocations.get(j).getLocation().getY() <= player.getLocation().getY() + getGridHeight())){
+					j++;
+				}
+				else{
+					removeRock(j);
+				}
+			}
+			else{
+				if ((multiplier == 1 && rockLocations.get(j).getLocation().getX() >= player.getLocation().getX() - getGridWidth() - 2) || (multiplier == -1 && rockLocations.get(j).getLocation().getX() <= player.getLocation().getX() + getGridWidth() + 2)){
+					j++;
+				}
+				else{
+					removeRock(j);
+				}
+			}
+			
+		}
+		for (int i = 0; i < newRockLocations.size(); i++){
+			rockLocations.add(newRockLocations.get(i));
+		}
+		newRockLocations.clear();
+	}
+
+
+
+	private void removeRock(int j) {
+		program.remove(rockLocations.get(j));
+		rockLocations.remove(j);
+	}
 	
 	
 	
 	private void printGrid(){
 		GridData grid = game.getGridData();
+		showRocks();
+		
 		for (int i = 0; i < grid.getNUM_COLS(); i++){
 			for (int j = 0; j < grid.getNUM_ROWS(); j++){
 				RowCol gridLocation = new RowCol(j, i);
 				if (grid.getSpaceData(gridLocation) == "Player"){
-					player.setLocation( i * getGridWidth() + 4, j * getGridHeight() + 13);
+					player.setLocation( getXFromRowCol(i) + 4, getYFromRowCol(j) + 13);
 					program.add(player);
 				}
 				
 			}
 		}
-		
 	}
+	
+	private double getXFromRowCol(int x){
+		return x * getGridWidth();
+	}
+	
+	private double getYFromRowCol(int y){
+		return y * getGridHeight();
+	}
+	
 	
 	private double getGridWidth(){
 		return program.getWidth() / game.getGridData().getNUM_COLS();
@@ -351,7 +479,7 @@ public class GraphicsGame extends GraphicsPane{
 	private double getGridHeight(){
 		return program.getHeight() / game.getGridData().getNUM_ROWS();
 	}
-	
+
 	
 	@Override
 	public void showContents() {

@@ -30,12 +30,17 @@ public class Game {
 	}
 	
 	private void initializeGridData(){
-		data = new GridData(worldLocation, OVERWORLD_SIZE);
+		data = new GridData(worldLocation, OVERWORLD_SIZE, 0, 0, null);
 	}
 	
 	private void addPlayerToGrid(){
 		data.addEntity(player.getLocation(), player.toString());
 	}
+	
+	public String getEntityAtLocation(RowCol location){
+		return data.getSpaceData(location);
+	}
+	
 
 	public GridData getGridData(){
 		return data;
@@ -56,6 +61,11 @@ public class Game {
 	public void setWorldLocation(int deltaX, int deltaY) {
 		worldLocation.setRow(worldLocation.getRow() + deltaX);
 		worldLocation.setCol(worldLocation.getCol() + deltaY);
+		data.moveGrid(deltaX, deltaY);
+		String[][] oldGrid = data.getGrid();
+		
+		data = null;
+		data = new GridData(worldLocation, OVERWORLD_SIZE, deltaX, -deltaY, oldGrid);
 		System.out.println("World Location: " + worldLocation);
 	}
 	
@@ -71,4 +81,7 @@ public class Game {
 	public static RowCol getOverworldSize() {
 		return OVERWORLD_SIZE;
 	}
+	
+	
+	
 }
