@@ -23,14 +23,17 @@ public class GridData {
 	
 	
 	
-	public GridData(RowCol worldGrid, RowCol gridSize, int cameFromX, int cameFromY, String[][] oldGrid, RowCol playerStartLocation){ // worldGrid, gridSize
+	public GridData(RowCol worldGrid, RowCol gridSize, int cameFromX, int cameFromY, String[][] oldGrid, RowCol playerStartLocation, int RNGSeed){ // worldGrid, gridSize
 		worldLocation = worldGrid;
 		movementQueue = new ArrayList<RowCol>();
 		this.cameFromX = cameFromX;
 		this.cameFromY = cameFromY;
 		rocks = new ArrayList<Rock>();
 		
-		rand = new Random();
+		rand = new Random(RNGSeed);
+
+		System.out.println("Seed: " + RNGSeed);
+		
 		grid = oldGrid;
 		this.playerStartLocation = playerStartLocation;
 		
@@ -71,10 +74,11 @@ public class GridData {
 		else if (cameFromY == -1){
 			iSizeFactor = 2;
 		}
-		for (int i = y; i < NUM_ROWS - iSizeFactor; i++){
-			for (int j = x; j < NUM_COLS - jSizeFactor; j++){
+		for (int i = 0; i < NUM_ROWS; i++){
+			for (int j = 0; j < NUM_COLS; j++){
 				grid[i][j] = "Empty";
-				if (rand.nextInt(ROCK_SPAWN_CHANCE) == 0 && i != playerStartLocation.getRow() && j != playerStartLocation.getCol()){
+				
+				if (rand.nextInt(ROCK_SPAWN_CHANCE) == 0 && (j >= x && i >= y && j < NUM_COLS - jSizeFactor && i < NUM_ROWS - iSizeFactor) && !(i == playerStartLocation.getRow() && j == playerStartLocation.getCol())){
 					grid[i][j] = "Rock";
 					rocks.add(new Rock(new RowCol(i, j)));
 				}

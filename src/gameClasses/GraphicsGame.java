@@ -1,4 +1,5 @@
 package gameClasses;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import menuClasses.*;
 
 public class GraphicsGame extends GraphicsPane{
 
-	private final RowCol STARTING_WORLD_POSITION = new RowCol(0, 0);
+	private RowCol STARTING_WORLD_POSITION;
 	private final int NUMBER_OF_SQUARES = 15;
 	
 	private ArrayList<GLine> horizontalGridLines;
@@ -38,18 +39,22 @@ public class GraphicsGame extends GraphicsPane{
  *******************************/
 	
 	public GraphicsGame(MainApplication app){
-		program = app;
+		program = app;		
+		rand = new Random();
+		STARTING_WORLD_POSITION = new RowCol(rand.nextInt(1000000) - 500000, rand.nextInt(1000000) - 500000);
 		game = new Game(STARTING_WORLD_POSITION);
 		pathLines = new ArrayList<GLine>();
 		player = new GLabel("Player");
 		rockLocations = new ArrayList<GLabel>();
 		newRockLocations = new ArrayList<GLabel>();
 		isCollidingWithRock = false;
+
 		
-		rand = new Random();
 		canPathBeDrawn = true;
 		isPlayerSelected = false;
 		createGrid();
+		
+		
 	}
 	
 
@@ -118,17 +123,20 @@ public class GraphicsGame extends GraphicsPane{
 								&& y >= 0) && game.getEntityAtLocation(consoleLocation) != "Rock"){
 							drawPathLines(consoleLocation);
 						}
+						addAndDrawPathLines();
+						mouseReleasedContents();
 					}
-					addAndDrawPathLines();
-					mouseReleasedContents();
 					return;
 				}
-				if (game.getEntityAtLocation(consoleLocation) == "Rock" || isCollidingWithRock){
+				if (game.getEntityAtLocation(consoleLocation) == "Rock" || (isCollidingWithRock && consoleLocation == game.getGridData().getMostRecentInMovementQueue())){
 					
 					isCollidingWithRock = true;
 					drawPathLines(consoleLocation);
 					addAndDrawPathLines();
 					return;
+				}
+				else{
+					isCollidingWithRock = false;
 				}
 				if (game.getGridData()
 						.getMovementQueueSize() < 1 || Math
@@ -175,10 +183,9 @@ public class GraphicsGame extends GraphicsPane{
 				return;
 			}
 			if (game.getEntityAtLocation(newLocation) != "Rock"){
-				game.getGridData().appendMovementQueue(newLocation);
+				drawPathLines(newLocation);
 			}
 			else{
-				System.out.println("ROCK WAS IN THE WAY");
 				isCollidingWithRock = true;
 				return;
 			}
@@ -202,14 +209,9 @@ public class GraphicsGame extends GraphicsPane{
 		return movingY == dest.getCol() ? 0 : movingY < dest.getCol() ? 1:-1;
 	}
 
-
-
 	private int moveX(RowCol dest, int movingX) {
 		return movingX == dest.getRow() ? 0 : movingX < dest.getRow() ? 1:-1;
 	}
-	
-	
-	
 
 	private void drawPathLines(RowCol consoleLocation) {
 		int indexContains = game.getGridData().movementQueueContains(consoleLocation);
@@ -239,6 +241,9 @@ public class GraphicsGame extends GraphicsPane{
 			RowCol rc1 = coords.get(i);
 			RowCol rc2 = coords.get(i + 1);
 			pathLines.add(new GLine(rc1.getCol() * getGridWidth() + getGridWidth() * 0.5, rc1.getRow() * getGridHeight() + getGridHeight() * 0.5, rc2.getCol() * getGridWidth() + getGridWidth() * 0.5, rc2.getRow() * getGridHeight() + getGridHeight() * 0.5));
+			if (isCollidingWithRock){
+				pathLines.get(i).setColor(Color.red);
+			}
 			program.add(pathLines.get(pathLines.size() - 1));
 		}
 		
